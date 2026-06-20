@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { CATEGORIES, SUPPLIER_STATUSES, PAYMENT_STATUSES } from "@/lib/constants";
+import SubmitButton from "@/components/SubmitButton";
 
 type Row = {
   _id: string;
@@ -244,12 +245,12 @@ export default function SupplierForm({
       <input type="hidden" name="payments" value={paymentsJson} />
 
       <div className="flex items-center gap-3">
-        <button
-          type="submit"
-          className="rounded-lg bg-rose-500 px-5 py-2 font-medium text-white hover:bg-rose-600"
+        <SubmitButton
+          pendingLabel="Salvando..."
+          className="rounded-lg bg-rose-500 px-5 py-2 font-medium text-white hover:bg-rose-600 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {submitLabel}
-        </button>
+        </SubmitButton>
         <Link
           href="/fornecedores"
           className="rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100"
