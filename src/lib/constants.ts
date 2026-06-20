@@ -1,0 +1,29 @@
+// Single source of truth for the fixed option lists, with Portuguese labels.
+
+export type Option = { value: string; label: string };
+
+export const CATEGORIES: readonly Option[] = [
+  { value: "VENUE", label: "Espaço" },
+  { value: "BUFFET", label: "Buffet" },
+  { value: "PHOTOGRAPHY", label: "Fotografia" },
+  { value: "MUSIC", label: "Música" },
+  { value: "DECORATION", label: "Decoração" },
+  { value: "ATTIRE", label: "Traje" },
+  { value: "OTHER", label: "Outro" },
+];
+
+export const SUPPLIER_STATUSES: readonly Option[] = [
+  { value: "NEGOTIATING", label: "Negociando" },
+  { value: "HIRED", label: "Contratado" },
+  { value: "CANCELLED", label: "Cancelado" },
+];
+
+export const PAYMENT_STATUSES: readonly Option[] = [
+  { value: "PENDING", label: "Pendente" },
+  { value: "PAID", label: "Pago" },
+];
+
+/** Look up the human label for a stored value, falling back to the value itself. */
+export function getLabel(list: readonly Option[], value: string): string {
+  return list.find((o) => o.value === value)?.label ?? value;
+}

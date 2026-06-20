@@ -1,0 +1,40 @@
+// Prisma schema — Prisma 7
+// Docs: connection URL lives in prisma.config.ts; the client uses a driver adapter.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// A wedding supplier (venue, buffet, photographer, etc.).
+// Money is stored in centavos (integer cents) to avoid rounding errors.
+model Supplier {
+  id        String    @id @default(cuid())
+  name      String
+  category  String    @default("OTHER") // see CATEGORIES in src/lib/constants.ts
+  totalCost Int       @default(0) // centavos
+  status    String    @default("NEGOTIATING") // NEGOTIATING | HIRED | CANCELLED
+  notes     String    @default("")
+  payments  Payment[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+// One scheduled payment belonging to a supplier.
+model Payment {
+  id         String    @id @default(cuid())
+  supplier   Supplier  @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  supplierId String
+  amount     Int // centavos
+  dueDate    DateTime  @db.Date
+  status     String    @default("PENDING") // PENDING | PAID
+  paidDate   DateTime? @db.Date
+  createdAt  DateTime  @default(now())
+
+  @@index([supplierId])
+  @@index([dueDate])
+}
