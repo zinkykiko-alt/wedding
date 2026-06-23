@@ -23,6 +23,12 @@ export const PAYMENT_STATUSES: readonly Option[] = [
   { value: "PAID", label: "Pago" },
 ];
 
+export const ATTACHMENT_LABELS: readonly Option[] = [
+  { value: "CONTRACT", label: "Contrato" },
+  { value: "RECEIPT", label: "Recibo/Comprovante" },
+  { value: "OTHER", label: "Outro" },
+];
+
 /** Look up the human label for a stored value, falling back to the value itself. */
 export function getLabel(list: readonly Option[], value: string): string {
   return list.find((o) => o.value === value)?.label ?? value;

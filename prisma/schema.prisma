@@ -20,6 +20,7 @@ model Supplier {
   status    String    @default("NEGOTIATING") // NEGOTIATING | HIRED | CANCELLED
   notes     String    @default("")
   payments  Payment[]
+  attachments Attachment[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
@@ -37,4 +38,21 @@ model Payment {
 
   @@index([supplierId])
   @@index([dueDate])
+}
+
+// A file uploaded for a supplier (contract, receipt, etc.). The bytes live in
+// Vercel Blob; here we keep the metadata and the Blob URL/pathname.
+model Attachment {
+  id          String   @id @default(cuid())
+  supplier    Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  supplierId  String
+  label       String   @default("OTHER") // CONTRACT | RECEIPT | OTHER
+  fileName    String
+  url         String
+  pathname    String
+  contentType String   @default("")
+  size        Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  @@index([supplierId])
 }
