@@ -23,12 +23,8 @@ export const config = {
   /**
    * Run on every path EXCEPT:
    *  - /login and /api/login (needed to actually log in)
-   *  - /api/attachments/upload (Vercel calls it back server-to-server after an
-   *    upload; it does its own login check inside)
    *  - Next.js internals (_next/static, _next/image)
    *  - any file with an extension (favicon.ico, images, etc.)
    */
-  matcher: [
-    "/((?!login|api/login|api/attachments/upload|_next/static|_next/image|.*\\..*).*)",
-  ],
+  matcher: ["/((?!login|api/login|_next/static|_next/image|.*\\..*).*)"],
 };

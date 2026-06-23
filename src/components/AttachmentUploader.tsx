@@ -2,9 +2,10 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { upload } from "@vercel/blob/client";
 import { ATTACHMENT_LABELS } from "@/lib/constants";
-import { saveAttachment } from "@/app/(app)/fornecedores/attachments-actions";
+
+// Vercel limits a serverless request body to ~4.5 MB; cap a little under that.
+const MAX_BYTES = 4.4 * 1024 * 1024;
 
 export default function AttachmentUploader({
   supplierId,
@@ -26,31 +27,33 @@ export default function AttachmentUploader({
       setError("Escolha um arquivo para enviar.");
       return;
     }
+    if (file.size > MAX_BYTES) {
+      setError(
+        "Arquivo muito grande (máximo cerca de 4 MB por enquanto). Tente um arquivo menor.",
+      );
+      return;
+    }
 
     setBusy(true);
     try {
-      const blob = await upload(file.name, file, {
-        access: "private",
-        handleUploadUrl: "/api/attachments/upload",
-        clientPayload: JSON.stringify({ supplierId, label }),
-        contentType: file.type || undefined,
-      });
+      const fd = new FormData();
+      fd.set("file", file);
+      fd.set("supplierId", supplierId);
+      fd.set("label", label);
 
-      await saveAttachment({
-        supplierId,
-        label,
-        fileName: file.name,
-        url: blob.url,
-        pathname: blob.pathname,
-        contentType: file.type || "",
-        size: file.size,
-      });
+      const res = await fetch("/api/attachments", { method: "POST", body: fd });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(data?.error || "Falha no envio.");
+      }
 
       if (fileRef.current) fileRef.current.value = "";
       router.refresh();
-    } catch {
+    } catch (err) {
       setError(
-        "Não foi possível enviar o arquivo. Verifique o tipo/tamanho e tente novamente.",
+        err instanceof Error
+          ? err.message
+          : "Não foi possível enviar o arquivo. Tente novamente.",
       );
     } finally {
       setBusy(false);
