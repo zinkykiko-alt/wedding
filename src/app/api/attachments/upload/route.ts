@@ -43,6 +43,8 @@ export async function POST(request: Request): Promise<NextResponse> {
 
     return NextResponse.json(result);
   } catch (error) {
+    // Surface the real cause in the Vercel function logs.
+    console.error("[attachments/upload] failed:", error);
     return NextResponse.json(
       { error: (error as Error).message },
       { status: 400 },
