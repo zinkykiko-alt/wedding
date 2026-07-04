@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
-import { formatBRL } from "@/lib/money";
+import { formatBRL, formatBRLCompact } from "@/lib/money";
 import { formatDateBR, todayUTC } from "@/lib/format";
 import { computeTimeline, type MonthBucket } from "@/lib/timeline";
 
@@ -14,6 +14,14 @@ function monthLabel(b: MonthBucket): string {
   });
 }
 
+function shortMonthLabel(b: MonthBucket): string {
+  const s = new Date(Date.UTC(b.year, b.month, 1)).toLocaleDateString("pt-BR", {
+    timeZone: "UTC",
+    month: "short",
+  });
+  return `${s.replace(".", "")}/${String(b.year).slice(2)}`;
+}
+
 function paymentState(p: { status: string; dueDate: Date }, today: Date) {
   if (p.status === "PAID") return { label: "Pago", cls: "bg-emerald-100 text-emerald-700" };
   if (new Date(p.dueDate) < today) return { label: "Vencido", cls: "bg-red-100 text-red-700" };
@@ -22,6 +30,9 @@ function paymentState(p: { status: string; dueDate: Date }, today: Date) {
 
 export default async function CronogramaPage() {
   const today = todayUTC();
+  const ty = today.getUTCFullYear();
+  const tm = today.getUTCMonth();
+
   const payments = await prisma.payment.findMany({
     where: { supplier: { status: { not: "CANCELLED" } } },
     include: { supplier: { select: { id: true, name: true } } },
@@ -54,6 +65,19 @@ export default async function CronogramaPage() {
   const grandOverdue = buckets.reduce((s, b) => s + b.overdue, 0);
   const rangeLabel = `${monthLabel(buckets[0])} — ${monthLabel(buckets[buckets.length - 1])}`;
 
+  const isPast = (b: MonthBucket) => b.year < ty || (b.year === ty && b.month < tm);
+  const isCurrent = (b: MonthBucket) => b.year === ty && b.month === tm;
+
+  function tooltip(b: MonthBucket): string {
+    const upcoming = b.pending - b.overdue;
+    const parts = [`${monthLabel(b)}: ${formatBRL(b.total)}`];
+    if (b.paid > 0) parts.push(`pago ${formatBRL(b.paid)}`);
+    if (upcoming > 0) parts.push(`a vencer ${formatBRL(upcoming)}`);
+    if (b.overdue > 0) parts.push(`vencido ${formatBRL(b.overdue)}`);
+    if (isPast(b)) parts.push("(mês passado)");
+    return parts.join(" · ");
+  }
+
   return (
     <div className="space-y-5">
       <div>
@@ -84,27 +108,92 @@ export default async function CronogramaPage() {
         </div>
       </div>
 
+      {/* Horizontal overview: one bar per month, scroll sideways. */}
+      <div className="rounded-2xl border border-rose-100 bg-white p-4">
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+          <span className="text-sm font-medium text-gray-700">Visão por mês</span>
+          <span className="text-xs text-gray-400">
+            Meses esmaecidos já passaram · toque para ver os detalhes
+          </span>
+        </div>
+        <div className="overflow-x-auto pb-1">
+          <div className="flex items-end gap-2">
+            {buckets.map((b) => {
+              const upcoming = b.pending - b.overdue;
+              const past = isPast(b);
+              const current = isCurrent(b);
+              return (
+                <a
+                  key={b.ym}
+                  href={`#mes-${b.ym}`}
+                  title={tooltip(b)}
+                  className={`flex w-16 shrink-0 flex-col items-center ${past ? "opacity-45" : ""}`}
+                >
+                  <div className="text-[10px] text-gray-400">
+                    {b.total > 0 ? formatBRLCompact(b.total) : "—"}
+                  </div>
+                  <div
+                    className={`mt-1 flex h-32 w-9 flex-col justify-end overflow-hidden rounded-md bg-gray-100 ${
+                      current ? "ring-2 ring-rose-400" : ""
+                    }`}
+                  >
+                    <div className="bg-red-400" style={{ height: `${(b.overdue / maxTotal) * 100}%` }} />
+                    <div className="bg-amber-400" style={{ height: `${(upcoming / maxTotal) * 100}%` }} />
+                    <div className="bg-emerald-400" style={{ height: `${(b.paid / maxTotal) * 100}%` }} />
+                  </div>
+                  <div
+                    className={`mt-1 whitespace-nowrap text-[11px] capitalize ${
+                      current ? "font-bold text-rose-600" : "text-gray-500"
+                    }`}
+                  >
+                    {shortMonthLabel(b)}
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+        </div>
+        <div className="mt-3 flex flex-wrap gap-4 text-xs text-gray-600">
+          <span className="flex items-center gap-1">
+            <span className="inline-block h-3 w-3 rounded bg-emerald-400" /> Pago
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="inline-block h-3 w-3 rounded bg-amber-400" /> A vencer
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="inline-block h-3 w-3 rounded bg-red-400" /> Vencido
+          </span>
+        </div>
+      </div>
+
+      {/* Detailed month cards */}
       <ul className="space-y-3">
         {buckets.map((b) => {
           const upcoming = b.pending - b.overdue;
-          const isCurrent =
-            today.getUTCFullYear() === b.year && today.getUTCMonth() === b.month;
+          const current = isCurrent(b);
+          const past = isPast(b);
           const empty = b.total === 0;
           return (
             <li
               key={b.ym}
-              className={`rounded-2xl border bg-white p-4 ${
-                isCurrent ? "border-rose-300 ring-1 ring-rose-200" : "border-rose-100"
-              } ${empty ? "opacity-60" : ""}`}
+              id={`mes-${b.ym}`}
+              className={`scroll-mt-20 rounded-2xl border bg-white p-4 ${
+                current ? "border-rose-300 ring-1 ring-rose-200" : "border-rose-100"
+              } ${empty || past ? "opacity-60" : ""}`}
             >
               <div className="flex items-baseline justify-between gap-3">
                 <div className="flex items-baseline gap-2">
                   <span className="font-medium capitalize text-gray-900">
                     {monthLabel(b)}
                   </span>
-                  {isCurrent && (
+                  {current && (
                     <span className="rounded-full bg-rose-500 px-2 py-0.5 text-[10px] font-medium text-white">
                       mês atual
+                    </span>
+                  )}
+                  {past && (
+                    <span className="rounded-full bg-gray-200 px-2 py-0.5 text-[10px] font-medium text-gray-500">
+                      já passou
                     </span>
                   )}
                 </div>

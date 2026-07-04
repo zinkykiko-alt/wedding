@@ -18,3 +18,15 @@ export function reaisToCentavos(reais: number): number {
 export function centavosToReais(centavos: number): number {
   return centavos / 100;
 }
+
+/** Compact currency for tight spaces, e.g. 425000 -> "R$ 4,3 mil", 250000000 -> "R$ 2,5 mi". */
+export function formatBRLCompact(centavos: number): string {
+  const reais = centavos / 100;
+  if (reais >= 1_000_000) {
+    return `R$ ${(reais / 1_000_000).toLocaleString("pt-BR", { maximumFractionDigits: 1 })} mi`;
+  }
+  if (reais >= 1000) {
+    return `R$ ${(reais / 1000).toLocaleString("pt-BR", { maximumFractionDigits: 1 })} mil`;
+  }
+  return formatBRL(centavos);
+}
