@@ -29,6 +29,17 @@ export const ATTACHMENT_LABELS: readonly Option[] = [
   { value: "OTHER", label: "Outro" },
 ];
 
+export const COMPANION_OPTIONS: readonly Option[] = [
+  { value: "0", label: "Sem acompanhante" },
+  { value: "1", label: "+1" },
+  { value: "2", label: "+2" },
+];
+
+export const GUEST_STATUSES: readonly Option[] = [
+  { value: "TITULAR", label: "Titular" },
+  { value: "BENCH", label: "Reserva" },
+];
+
 /** Look up the human label for a stored value, falling back to the value itself. */
 export function getLabel(list: readonly Option[], value: string): string {
   return list.find((o) => o.value === value)?.label ?? value;

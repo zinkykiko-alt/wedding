@@ -40,6 +40,17 @@ model Payment {
   @@index([dueDate])
 }
 
+// A wedding guest.
+model Guest {
+  id         String   @id @default(cuid())
+  name       String
+  companions Int      @default(0) // 0, 1, or 2 (none / +1 / +2)
+  kids       Int      @default(0)
+  status     String   @default("TITULAR") // TITULAR (counts) | BENCH (reserve)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
 // A file uploaded for a supplier (contract, receipt, etc.). The bytes live in
 // Vercel Blob; here we keep the metadata and the Blob URL/pathname.
 model Attachment {
