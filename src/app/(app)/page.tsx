@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 const sections = [
   { href: "/fornecedores", emoji: "📋", title: "Fornecedores", description: "Cadastre buffet, espaço, fotógrafo e acompanhe os pagamentos." },
-  { href: "/calendario", emoji: "📅", title: "Calendário de pagamentos", description: "Veja as datas de vencimento e o que está atrasado ou próximo." },
+  { href: "/calendario", emoji: "📅", title: "Cronograma de pagamentos", description: "Veja mês a mês quanto vence, o que está atrasado e o que já foi pago." },
   { href: "/convidados", emoji: "👰", title: "Lista de convidados", description: "Controle confirmados, acompanhantes, crianças e a reserva." },
 ];
 
@@ -83,7 +83,7 @@ export default async function PainelPage() {
           className="block rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-800 hover:bg-red-100"
         >
           ⚠️ Você tem {formatBRL(m.overdue)} em pagamentos vencidos. Ver no
-          calendário →
+          cronograma →
         </Link>
       )}
 

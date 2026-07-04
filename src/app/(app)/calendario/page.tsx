@@ -1,173 +1,164 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { formatBRL } from "@/lib/money";
-import { todayUTC } from "@/lib/format";
+import { formatDateBR, todayUTC } from "@/lib/format";
+import { computeTimeline, type MonthBucket } from "@/lib/timeline";
 
 export const dynamic = "force-dynamic";
 
-const WEEKDAYS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
-
-function parseYm(ym: string | undefined, fallback: Date): { y: number; mo: number } {
-  if (ym && /^\d{4}-\d{2}$/.test(ym)) {
-    const [y, m] = ym.split("-").map(Number);
-    if (m >= 1 && m <= 12) return { y, mo: m - 1 };
-  }
-  return { y: fallback.getUTCFullYear(), mo: fallback.getUTCMonth() };
+function monthLabel(b: MonthBucket): string {
+  return new Date(Date.UTC(b.year, b.month, 1)).toLocaleDateString("pt-BR", {
+    timeZone: "UTC",
+    month: "long",
+    year: "numeric",
+  });
 }
 
-function ymStr(y: number, mo: number): string {
-  return `${y}-${String(mo + 1).padStart(2, "0")}`;
+function paymentState(p: { status: string; dueDate: Date }, today: Date) {
+  if (p.status === "PAID") return { label: "Pago", cls: "bg-emerald-100 text-emerald-700" };
+  if (new Date(p.dueDate) < today) return { label: "Vencido", cls: "bg-red-100 text-red-700" };
+  return { label: "A vencer", cls: "bg-amber-100 text-amber-800" };
 }
 
-export default async function CalendarioPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ ym?: string }>;
-}) {
-  const { ym } = await searchParams;
+export default async function CronogramaPage() {
   const today = todayUTC();
-  const { y, mo } = parseYm(ym, today);
-
   const payments = await prisma.payment.findMany({
     where: { supplier: { status: { not: "CANCELLED" } } },
     include: { supplier: { select: { id: true, name: true } } },
     orderBy: { dueDate: "asc" },
   });
-  type PaymentRow = (typeof payments)[number];
 
-  const byDay = new Map<number, PaymentRow[]>();
-  for (const p of payments) {
-    const d = new Date(p.dueDate);
-    if (d.getUTCFullYear() === y && d.getUTCMonth() === mo) {
-      const day = d.getUTCDate();
-      const arr = byDay.get(day) ?? [];
-      arr.push(p);
-      byDay.set(day, arr);
-    }
+  const buckets = computeTimeline(payments, today);
+
+  if (buckets.length === 0) {
+    return (
+      <div className="space-y-4">
+        <h1 className="text-2xl font-semibold text-gray-900">
+          Cronograma de pagamentos
+        </h1>
+        <div className="rounded-2xl border border-dashed border-rose-200 bg-white p-10 text-center">
+          <div className="text-4xl">📅</div>
+          <p className="mt-3 font-medium text-gray-700">Nenhum pagamento ainda</p>
+          <p className="mt-1 text-sm text-gray-500">
+            Adicione um cronograma de pagamentos em cada fornecedor para ver a
+            linha do tempo por mês.
+          </p>
+        </div>
+      </div>
+    );
   }
 
-  const firstOfMonth = new Date(Date.UTC(y, mo, 1));
-  const startWeekday = firstOfMonth.getUTCDay();
-  const daysInMonth = new Date(Date.UTC(y, mo + 1, 0)).getUTCDate();
-  const totalCells = Math.ceil((startWeekday + daysInMonth) / 7) * 7;
-
-  const monthTitle = firstOfMonth.toLocaleDateString("pt-BR", {
-    timeZone: "UTC",
-    month: "long",
-    year: "numeric",
-  });
-  const prev = ymStr(mo === 0 ? y - 1 : y, mo === 0 ? 11 : mo - 1);
-  const next = ymStr(mo === 11 ? y + 1 : y, mo === 11 ? 0 : mo + 1);
-
-  function chipClass(p: PaymentRow): string {
-    if (p.status === "PAID") return "bg-emerald-100 text-emerald-700";
-    return new Date(p.dueDate) < today
-      ? "bg-red-100 text-red-700"
-      : "bg-amber-100 text-amber-800";
-  }
-
-  const cells = Array.from({ length: totalCells }, (_, i) => {
-    const dayNum = i - startWeekday + 1;
-    const inMonth = dayNum >= 1 && dayNum <= daysInMonth;
-    const isToday =
-      inMonth &&
-      today.getUTCFullYear() === y &&
-      today.getUTCMonth() === mo &&
-      today.getUTCDate() === dayNum;
-    const dayPayments = inMonth ? byDay.get(dayNum) ?? [] : [];
-    return { key: i, dayNum, inMonth, isToday, dayPayments };
-  });
+  const maxTotal = Math.max(...buckets.map((b) => b.total), 1);
+  const grandPaid = buckets.reduce((s, b) => s + b.paid, 0);
+  const grandPending = buckets.reduce((s, b) => s + b.pending, 0);
+  const grandOverdue = buckets.reduce((s, b) => s + b.overdue, 0);
+  const rangeLabel = `${monthLabel(buckets[0])} — ${monthLabel(buckets[buckets.length - 1])}`;
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-semibold text-gray-900">
-        Calendário de pagamentos
-      </h1>
-
-      <div className="flex items-center justify-between">
-        <Link
-          href={`/calendario?ym=${prev}`}
-          className="rounded-lg px-3 py-1.5 text-sm text-gray-600 hover:bg-rose-100 hover:text-rose-700"
-        >
-          ← Anterior
-        </Link>
-        <span className="font-medium capitalize text-gray-900">{monthTitle}</span>
-        <Link
-          href={`/calendario?ym=${next}`}
-          className="rounded-lg px-3 py-1.5 text-sm text-gray-600 hover:bg-rose-100 hover:text-rose-700"
-        >
-          Próximo →
-        </Link>
+    <div className="space-y-5">
+      <div>
+        <h1 className="text-2xl font-semibold text-gray-900">
+          Cronograma de pagamentos
+        </h1>
+        <p className="mt-1 text-sm capitalize text-gray-500">{rangeLabel}</p>
       </div>
 
-      <div className="flex flex-wrap gap-4 text-xs text-gray-600">
-        <span className="flex items-center gap-1">
-          <span className="inline-block h-3 w-3 rounded bg-red-200" /> Vencido
-        </span>
-        <span className="flex items-center gap-1">
-          <span className="inline-block h-3 w-3 rounded bg-amber-200" /> A vencer
-        </span>
-        <span className="flex items-center gap-1">
-          <span className="inline-block h-3 w-3 rounded bg-emerald-200" /> Pago
-        </span>
-      </div>
-
-      {payments.length === 0 && (
-        <p className="text-sm text-gray-500">
-          Nenhum pagamento cadastrado ainda. Adicione um cronograma de pagamentos
-          em cada fornecedor.
-        </p>
-      )}
-
-      <div className="overflow-x-auto">
-        <div className="min-w-[680px]">
-          <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium text-gray-500">
-            {WEEKDAYS.map((w) => (
-              <div key={w} className="py-1">
-                {w}
-              </div>
-            ))}
+      <div className="grid grid-cols-3 gap-3">
+        <div className="rounded-xl border border-rose-100 bg-white p-3">
+          <div className="text-xs text-gray-500">A vencer</div>
+          <div className="mt-0.5 font-semibold text-amber-600">
+            {formatBRL(grandPending - grandOverdue)}
           </div>
-          <div className="mt-1 grid grid-cols-7 gap-1">
-            {cells.map((c) => (
-              <div
-                key={c.key}
-                className={`min-h-[92px] rounded-lg border p-1 ${
-                  c.inMonth ? "border-rose-100 bg-white" : "border-transparent bg-transparent"
-                } ${c.isToday ? "ring-2 ring-rose-400" : ""}`}
-              >
-                {c.inMonth && (
-                  <>
-                    <div
-                      className={`mb-1 text-right text-xs ${
-                        c.isToday ? "font-bold text-rose-600" : "text-gray-400"
-                      }`}
-                    >
-                      {c.dayNum}
-                    </div>
-                    <div className="space-y-1">
-                      {c.dayPayments.map((p) => (
-                        <Link
-                          key={p.id}
-                          href={`/fornecedores/${p.supplier.id}`}
-                          title={`${p.supplier.name} — ${formatBRL(p.amount)}`}
-                          className={`block truncate rounded px-1 py-0.5 text-[11px] leading-tight hover:opacity-80 ${chipClass(p)}`}
-                        >
-                          {formatBRL(p.amount)}
-                        </Link>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
-            ))}
+        </div>
+        <div className="rounded-xl border border-rose-100 bg-white p-3">
+          <div className="text-xs text-gray-500">Vencido</div>
+          <div className="mt-0.5 font-semibold text-red-600">
+            {formatBRL(grandOverdue)}
+          </div>
+        </div>
+        <div className="rounded-xl border border-rose-100 bg-white p-3">
+          <div className="text-xs text-gray-500">Pago</div>
+          <div className="mt-0.5 font-semibold text-emerald-600">
+            {formatBRL(grandPaid)}
           </div>
         </div>
       </div>
 
-      <p className="text-xs text-gray-400">
-        Toque em um pagamento para abrir o fornecedor.
-      </p>
+      <ul className="space-y-3">
+        {buckets.map((b) => {
+          const upcoming = b.pending - b.overdue;
+          const isCurrent =
+            today.getUTCFullYear() === b.year && today.getUTCMonth() === b.month;
+          const empty = b.total === 0;
+          return (
+            <li
+              key={b.ym}
+              className={`rounded-2xl border bg-white p-4 ${
+                isCurrent ? "border-rose-300 ring-1 ring-rose-200" : "border-rose-100"
+              } ${empty ? "opacity-60" : ""}`}
+            >
+              <div className="flex items-baseline justify-between gap-3">
+                <div className="flex items-baseline gap-2">
+                  <span className="font-medium capitalize text-gray-900">
+                    {monthLabel(b)}
+                  </span>
+                  {isCurrent && (
+                    <span className="rounded-full bg-rose-500 px-2 py-0.5 text-[10px] font-medium text-white">
+                      mês atual
+                    </span>
+                  )}
+                </div>
+                <span className="font-semibold text-gray-900">
+                  {formatBRL(b.total)}
+                </span>
+              </div>
+
+              {!empty && (
+                <>
+                  <div className="mt-2 flex h-2 w-full overflow-hidden rounded-full bg-gray-100">
+                    <div className="bg-emerald-400" style={{ width: `${(b.paid / maxTotal) * 100}%` }} />
+                    <div className="bg-amber-400" style={{ width: `${(upcoming / maxTotal) * 100}%` }} />
+                    <div className="bg-red-400" style={{ width: `${(b.overdue / maxTotal) * 100}%` }} />
+                  </div>
+
+                  <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs">
+                    {upcoming > 0 && (
+                      <span className="text-amber-700">A vencer {formatBRL(upcoming)}</span>
+                    )}
+                    {b.overdue > 0 && (
+                      <span className="text-red-700">Vencido {formatBRL(b.overdue)}</span>
+                    )}
+                    {b.paid > 0 && (
+                      <span className="text-emerald-700">Pago {formatBRL(b.paid)}</span>
+                    )}
+                  </div>
+
+                  <ul className="mt-3 divide-y divide-gray-100">
+                    {b.payments.map((p) => {
+                      const st = paymentState(p, today);
+                      return (
+                        <li key={p.id} className="flex items-center justify-between gap-3 py-1.5 text-sm">
+                          <Link
+                            href={`/fornecedores/${p.supplier.id}`}
+                            className="min-w-0 flex-1 truncate text-gray-700 hover:text-rose-700"
+                          >
+                            <span className="text-gray-400">{formatDateBR(p.dueDate)}</span>{" "}
+                            {p.supplier.name}
+                          </Link>
+                          <span className="text-gray-900">{formatBRL(p.amount)}</span>
+                          <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${st.cls}`}>
+                            {st.label}
+                          </span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </>
+              )}
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }
