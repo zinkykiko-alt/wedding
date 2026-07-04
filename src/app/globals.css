@@ -1,9 +1,41 @@
 @import "tailwindcss";
 
-@theme inline {
+@theme {
   --font-sans: var(--font-geist-sans);
+  --font-serif: var(--font-playfair);
+  --font-script: var(--font-great-vibes);
+
+  /* Warm ivory background */
+  --color-cream: #f6f1e6;
+
+  /* Terracotta — the brand accent from the monogram */
+  --color-brand-50: #faf5ef;
+  --color-brand-100: #f1e7d8;
+  --color-brand-200: #e6d0b5;
+  --color-brand-300: #d4ac82;
+  --color-brand-400: #c08a56;
+  --color-brand-500: #a3652f;
+  --color-brand-600: #8a5228;
+  --color-brand-700: #6d4021;
+  --color-brand-800: #58341d;
+  --color-brand-900: #492c1b;
+
+  /* Olive — the soft green from the invitation */
+  --color-olive-50: #f2f3ea;
+  --color-olive-100: #e3e5cf;
+  --color-olive-200: #cbcfa4;
+  --color-olive-500: #6a7045;
+  --color-olive-600: #555b37;
+  --color-olive-700: #45492e;
 }
 
 body {
+  background-color: var(--color-cream);
+  color: #3f362e;
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Elegant serif for the main page titles, echoing the invitation. */
+h1 {
+  font-family: var(--font-playfair), Georgia, serif;
 }

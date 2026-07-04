@@ -3,8 +3,36 @@ import { prisma } from "@/lib/db";
 import { formatBRL } from "@/lib/money";
 import { CATEGORIES, getLabel } from "@/lib/constants";
 import { computeDashboard } from "@/lib/dashboard";
+import { WEDDING, daysUntilWedding } from "@/lib/wedding";
+import { todayUTC } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
+
+function WeddingHero() {
+  const days = daysUntilWedding(todayUTC());
+  const countdown =
+    days > 0
+      ? `Faltam ${days.toLocaleString("pt-BR")} dias`
+      : days === 0
+        ? "É hoje! 🎉"
+        : "Vocês já casaram! 🎉";
+  return (
+    <section className="rounded-2xl border border-brand-100 bg-white p-6 text-center">
+      <p className="text-[11px] uppercase tracking-[0.3em] text-olive-600">
+        O grande dia
+      </p>
+      <div className="mt-1 font-script text-4xl text-olive-700">
+        {WEDDING.bride} &amp; {WEDDING.groom}
+      </div>
+      <p className="mt-1 font-serif tracking-wide text-brand-600">
+        {WEDDING.dateShort} · {WEDDING.venue}
+      </p>
+      <div className="mt-3 inline-block rounded-full bg-brand-50 px-4 py-1.5 text-sm font-medium text-brand-700">
+        💍 {countdown}
+      </div>
+    </section>
+  );
+}
 
 const sections = [
   { href: "/fornecedores", emoji: "📋", title: "Fornecedores", description: "Cadastre buffet, espaço, fotógrafo e acompanhe os pagamentos." },
@@ -22,7 +50,7 @@ function Kpi({
   valueClass?: string;
 }) {
   return (
-    <div className="rounded-2xl border border-rose-100 bg-white p-4">
+    <div className="rounded-2xl border border-brand-100 bg-white p-4">
       <div className="text-sm text-gray-500">{label}</div>
       <div className={`mt-1 text-xl font-semibold ${valueClass}`}>{value}</div>
     </div>
@@ -34,8 +62,9 @@ export default async function PainelPage() {
 
   if (suppliers.length === 0) {
     return (
-      <div className="space-y-8">
-        <section className="rounded-2xl border border-rose-100 bg-white p-6">
+      <div className="space-y-6">
+        <WeddingHero />
+        <section className="rounded-2xl border border-brand-100 bg-white p-6">
           <h1 className="text-2xl font-semibold text-gray-900">
             Bem-vindo(a) ao seu planejador 💍
           </h1>
@@ -45,7 +74,7 @@ export default async function PainelPage() {
           </p>
           <Link
             href="/fornecedores/novo"
-            className="mt-4 inline-block rounded-lg bg-rose-500 px-4 py-2 text-sm font-medium text-white hover:bg-rose-600"
+            className="mt-4 inline-block rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600"
           >
             + Cadastrar primeiro fornecedor
           </Link>
@@ -55,7 +84,7 @@ export default async function PainelPage() {
             <Link
               key={s.href}
               href={s.href}
-              className="rounded-2xl border border-rose-100 bg-white p-5 transition-shadow hover:shadow-md"
+              className="rounded-2xl border border-brand-100 bg-white p-5 transition-shadow hover:shadow-md"
             >
               <div className="text-2xl">{s.emoji}</div>
               <h2 className="mt-2 font-semibold text-gray-900">{s.title}</h2>
@@ -75,6 +104,7 @@ export default async function PainelPage() {
 
   return (
     <div className="space-y-6">
+      <WeddingHero />
       <h1 className="text-2xl font-semibold text-gray-900">Painel financeiro</h1>
 
       {m.overdue > 0 && (
@@ -94,7 +124,7 @@ export default async function PainelPage() {
         <Kpi label="Vence em 30 dias" value={formatBRL(m.dueSoon)} valueClass="text-sky-600" />
       </div>
 
-      <div className="rounded-2xl border border-rose-100 bg-white p-5">
+      <div className="rounded-2xl border border-brand-100 bg-white p-5">
         <div className="flex items-center justify-between text-sm font-medium text-gray-700">
           <span>Progresso de pagamento</span>
           <span>{pctPaid}%</span>
@@ -111,7 +141,7 @@ export default async function PainelPage() {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-rose-100 bg-white p-5">
+      <div className="rounded-2xl border border-brand-100 bg-white p-5">
         <h2 className="mb-3 font-semibold text-gray-900">Custo por categoria</h2>
         {m.byCategory.length === 0 ? (
           <p className="text-sm text-gray-500">
@@ -131,7 +161,7 @@ export default async function PainelPage() {
                 </div>
                 <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-gray-100">
                   <div
-                    className="h-2 rounded-full bg-rose-400"
+                    className="h-2 rounded-full bg-brand-400"
                     style={{ width: `${maxCat > 0 ? Math.round((c.total / maxCat) * 100) : 0}%` }}
                   />
                 </div>

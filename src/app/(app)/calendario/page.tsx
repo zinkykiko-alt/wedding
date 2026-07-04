@@ -47,7 +47,7 @@ export default async function CronogramaPage() {
         <h1 className="text-2xl font-semibold text-gray-900">
           Cronograma de pagamentos
         </h1>
-        <div className="rounded-2xl border border-dashed border-rose-200 bg-white p-10 text-center">
+        <div className="rounded-2xl border border-dashed border-brand-200 bg-white p-10 text-center">
           <div className="text-4xl">📅</div>
           <p className="mt-3 font-medium text-gray-700">Nenhum pagamento ainda</p>
           <p className="mt-1 text-sm text-gray-500">
@@ -88,19 +88,19 @@ export default async function CronogramaPage() {
       </div>
 
       <div className="grid grid-cols-3 gap-3">
-        <div className="rounded-xl border border-rose-100 bg-white p-3">
+        <div className="rounded-xl border border-brand-100 bg-white p-3">
           <div className="text-xs text-gray-500">A vencer</div>
           <div className="mt-0.5 font-semibold text-amber-600">
             {formatBRL(grandPending - grandOverdue)}
           </div>
         </div>
-        <div className="rounded-xl border border-rose-100 bg-white p-3">
+        <div className="rounded-xl border border-brand-100 bg-white p-3">
           <div className="text-xs text-gray-500">Vencido</div>
           <div className="mt-0.5 font-semibold text-red-600">
             {formatBRL(grandOverdue)}
           </div>
         </div>
-        <div className="rounded-xl border border-rose-100 bg-white p-3">
+        <div className="rounded-xl border border-brand-100 bg-white p-3">
           <div className="text-xs text-gray-500">Pago</div>
           <div className="mt-0.5 font-semibold text-emerald-600">
             {formatBRL(grandPaid)}
@@ -109,7 +109,7 @@ export default async function CronogramaPage() {
       </div>
 
       {/* Horizontal overview: one bar per month, scroll sideways. */}
-      <div className="rounded-2xl border border-rose-100 bg-white p-4">
+      <div className="rounded-2xl border border-brand-100 bg-white p-4">
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
           <span className="text-sm font-medium text-gray-700">Visão por mês</span>
           <span className="text-xs text-gray-400">
@@ -134,7 +134,7 @@ export default async function CronogramaPage() {
                   </div>
                   <div
                     className={`mt-1 flex h-32 w-9 flex-col justify-end overflow-hidden rounded-md bg-gray-100 ${
-                      current ? "ring-2 ring-rose-400" : ""
+                      current ? "ring-2 ring-brand-400" : ""
                     }`}
                   >
                     <div className="bg-red-400" style={{ height: `${(b.overdue / maxTotal) * 100}%` }} />
@@ -143,7 +143,7 @@ export default async function CronogramaPage() {
                   </div>
                   <div
                     className={`mt-1 whitespace-nowrap text-[11px] capitalize ${
-                      current ? "font-bold text-rose-600" : "text-gray-500"
+                      current ? "font-bold text-brand-600" : "text-gray-500"
                     }`}
                   >
                     {shortMonthLabel(b)}
@@ -178,7 +178,7 @@ export default async function CronogramaPage() {
               key={b.ym}
               id={`mes-${b.ym}`}
               className={`scroll-mt-20 rounded-2xl border bg-white p-4 ${
-                current ? "border-rose-300 ring-1 ring-rose-200" : "border-rose-100"
+                current ? "border-brand-300 ring-1 ring-brand-200" : "border-brand-100"
               } ${empty || past ? "opacity-60" : ""}`}
             >
               <div className="flex items-baseline justify-between gap-3">
@@ -187,7 +187,7 @@ export default async function CronogramaPage() {
                     {monthLabel(b)}
                   </span>
                   {current && (
-                    <span className="rounded-full bg-rose-500 px-2 py-0.5 text-[10px] font-medium text-white">
+                    <span className="rounded-full bg-brand-500 px-2 py-0.5 text-[10px] font-medium text-white">
                       mês atual
                     </span>
                   )}
@@ -229,7 +229,7 @@ export default async function CronogramaPage() {
                         <li key={p.id} className="flex items-center justify-between gap-3 py-1.5 text-sm">
                           <Link
                             href={`/fornecedores/${p.supplier.id}`}
-                            className="min-w-0 flex-1 truncate text-gray-700 hover:text-rose-700"
+                            className="min-w-0 flex-1 truncate text-gray-700 hover:text-brand-700"
                           >
                             <span className="text-gray-400">{formatDateBR(p.dueDate)}</span>{" "}
                             {p.supplier.name}

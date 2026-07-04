@@ -48,7 +48,7 @@ export default async function EditarFornecedorPage({
   return (
     <div className="space-y-6">
       <div>
-        <Link href="/fornecedores" className="text-sm text-gray-500 hover:text-rose-700">
+        <Link href="/fornecedores" className="text-sm text-gray-500 hover:text-brand-700">
           ← Voltar
         </Link>
         <h1 className="mt-1 text-2xl font-semibold text-gray-900">Editar fornecedor</h1>
@@ -56,7 +56,7 @@ export default async function EditarFornecedorPage({
 
       <SupplierForm action={update} initial={initial} submitLabel="Salvar alterações" />
 
-      <section className="rounded-2xl border border-rose-100 bg-white p-5">
+      <section className="rounded-2xl border border-brand-100 bg-white p-5">
         <h2 className="font-semibold text-gray-900">
           Anexos (contratos e comprovantes)
         </h2>
@@ -79,7 +79,7 @@ export default async function EditarFornecedorPage({
                   href={`/api/attachments/${a.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="min-w-0 flex-1 truncate text-sm font-medium text-rose-700 hover:underline"
+                  className="min-w-0 flex-1 truncate text-sm font-medium text-brand-700 hover:underline"
                 >
                   {a.fileName}
                   <span className="ml-2 font-normal text-gray-400">

@@ -16,7 +16,7 @@ export default function DeleteAttachmentButton({
     >
       <SubmitButton
         pendingLabel="..."
-        className="text-sm text-gray-400 hover:text-rose-600 disabled:opacity-60"
+        className="text-sm text-gray-400 hover:text-brand-600 disabled:opacity-60"
       >
         Remover
       </SubmitButton>

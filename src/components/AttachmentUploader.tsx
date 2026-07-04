@@ -73,7 +73,7 @@ export default function AttachmentUploader({
           <select
             value={label}
             onChange={(e) => setLabel(e.target.value)}
-            className="rounded-lg border border-gray-300 px-3 py-2 text-gray-900 outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-200"
+            className="rounded-lg border border-gray-300 px-3 py-2 text-gray-900 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-200"
           >
             {ATTACHMENT_LABELS.map((l) => (
               <option key={l.value} value={l.value}>
@@ -90,18 +90,18 @@ export default function AttachmentUploader({
             ref={fileRef}
             type="file"
             accept=".pdf,image/*"
-            className="block w-full text-sm text-gray-700 file:mr-3 file:rounded-lg file:border-0 file:bg-rose-100 file:px-3 file:py-2 file:text-sm file:font-medium file:text-rose-700 hover:file:bg-rose-200"
+            className="block w-full text-sm text-gray-700 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-100 file:px-3 file:py-2 file:text-sm file:font-medium file:text-brand-700 hover:file:bg-brand-200"
           />
         </div>
         <button
           type="submit"
           disabled={busy}
-          className="rounded-lg bg-rose-500 px-4 py-2 font-medium text-white hover:bg-rose-600 disabled:cursor-not-allowed disabled:opacity-60"
+          className="rounded-lg bg-brand-500 px-4 py-2 font-medium text-white hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {busy ? "Enviando..." : "Enviar arquivo"}
         </button>
       </div>
-      {error && <p className="mt-2 text-sm text-rose-700">{error}</p>}
+      {error && <p className="mt-2 text-sm text-brand-700">{error}</p>}
     </form>
   );
 }

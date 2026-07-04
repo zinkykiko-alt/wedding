@@ -29,7 +29,7 @@ export default async function EditarConvidadoPage({
   return (
     <div className="space-y-6">
       <div>
-        <Link href="/convidados" className="text-sm text-gray-500 hover:text-rose-700">
+        <Link href="/convidados" className="text-sm text-gray-500 hover:text-brand-700">
           ← Voltar
         </Link>
         <h1 className="mt-1 text-2xl font-semibold text-gray-900">Editar convidado</h1>

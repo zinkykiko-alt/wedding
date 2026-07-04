@@ -17,7 +17,7 @@ function SideBadge({ side }: { side: string }) {
   if (side === "ALICIA")
     return (
       <span className="shrink-0 rounded-full bg-violet-100 px-2 py-0.5 text-[11px] font-medium text-violet-700">
-        Alicia
+        Alícia
       </span>
     );
   if (side === "BRUNO")
@@ -34,7 +34,7 @@ function GuestRow({ g }: { g: Guest }) {
   return (
     <Link
       href={`/convidados/${g.id}`}
-      className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-rose-50"
+      className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-brand-50"
     >
       <span className="flex min-w-0 items-center gap-2">
         <span className="truncate font-medium text-gray-900">{g.name}</span>
@@ -60,14 +60,14 @@ export default async function ConvidadosPage() {
         <h1 className="text-2xl font-semibold text-gray-900">Lista de convidados</h1>
         <Link
           href="/convidados/novo"
-          className="rounded-lg bg-rose-500 px-4 py-2 text-sm font-medium text-white hover:bg-rose-600"
+          className="rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600"
         >
           + Novo convidado
         </Link>
       </div>
 
       {guests.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-rose-200 bg-white p-10 text-center">
+        <div className="rounded-2xl border border-dashed border-brand-200 bg-white p-10 text-center">
           <div className="text-4xl">👰</div>
           <p className="mt-3 font-medium text-gray-700">Nenhum convidado ainda</p>
           <p className="mt-1 text-sm text-gray-500">
@@ -75,7 +75,7 @@ export default async function ConvidadosPage() {
           </p>
           <Link
             href="/convidados/novo"
-            className="mt-4 inline-block rounded-lg bg-rose-500 px-4 py-2 text-sm font-medium text-white hover:bg-rose-600"
+            className="mt-4 inline-block rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600"
           >
             + Novo convidado
           </Link>
@@ -83,7 +83,7 @@ export default async function ConvidadosPage() {
       ) : (
         <>
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-2xl border border-rose-100 bg-white p-5">
+            <div className="rounded-2xl border border-brand-100 bg-white p-5">
               <div className="text-sm text-gray-500">Pessoas confirmadas</div>
               <div className="mt-1 text-3xl font-semibold text-gray-900">
                 {hc.titularPeople}
@@ -95,7 +95,7 @@ export default async function ConvidadosPage() {
               </p>
               <p className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm">
                 <span className="font-medium text-violet-700">
-                  Alicia {hc.bySide.ALICIA}
+                  Alícia {hc.bySide.ALICIA}
                 </span>
                 <span className="font-medium text-sky-700">
                   Bruno {hc.bySide.BRUNO}
@@ -105,7 +105,7 @@ export default async function ConvidadosPage() {
                 )}
               </p>
             </div>
-            <div className="rounded-2xl border border-rose-100 bg-white p-5">
+            <div className="rounded-2xl border border-brand-100 bg-white p-5">
               <div className="text-sm text-gray-500">Reserva (backup)</div>
               <div className="mt-1 text-3xl font-semibold text-gray-500">
                 {hc.benchPeople}
@@ -123,7 +123,7 @@ export default async function ConvidadosPage() {
             {titulars.length === 0 ? (
               <p className="text-sm text-gray-500">Nenhum titular ainda.</p>
             ) : (
-              <div className="divide-y divide-gray-100 overflow-hidden rounded-2xl border border-rose-100 bg-white">
+              <div className="divide-y divide-gray-100 overflow-hidden rounded-2xl border border-brand-100 bg-white">
                 {titulars.map((g) => (
                   <GuestRow key={g.id} g={g} />
                 ))}
@@ -136,7 +136,7 @@ export default async function ConvidadosPage() {
               <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">
                 Reserva ({bench.length})
               </h2>
-              <div className="divide-y divide-gray-100 overflow-hidden rounded-2xl border border-rose-100 bg-white">
+              <div className="divide-y divide-gray-100 overflow-hidden rounded-2xl border border-brand-100 bg-white">
                 {bench.map((g) => (
                   <GuestRow key={g.id} g={g} />
                 ))}

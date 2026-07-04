@@ -42,7 +42,7 @@ export const GUEST_STATUSES: readonly Option[] = [
 
 // The two sides of the wedding. "" means not assigned yet.
 export const GUEST_SIDES: readonly Option[] = [
-  { value: "ALICIA", label: "Alicia" },
+  { value: "ALICIA", label: "Alícia" },
   { value: "BRUNO", label: "Bruno" },
 ];
 

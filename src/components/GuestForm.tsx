@@ -11,7 +11,7 @@ export type GuestInitial = {
 };
 
 const field =
-  "w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-200";
+  "w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-200";
 const labelCls = "mb-1 block text-sm font-medium text-gray-700";
 
 export default function GuestForm({
@@ -24,7 +24,7 @@ export default function GuestForm({
   submitLabel?: string;
 }) {
   return (
-    <form action={action} className="space-y-4 rounded-2xl border border-rose-100 bg-white p-5">
+    <form action={action} className="space-y-4 rounded-2xl border border-brand-100 bg-white p-5">
       <div>
         <label htmlFor="name" className={labelCls}>
           Nome *
@@ -111,14 +111,14 @@ export default function GuestForm({
               </option>
             ))}
           </select>
-          <p className="mt-1 text-xs text-gray-400">Convidado da Alicia ou do Bruno.</p>
+          <p className="mt-1 text-xs text-gray-400">Convidado da Alícia ou do Bruno.</p>
         </div>
       </div>
 
       <div className="flex items-center gap-3">
         <SubmitButton
           pendingLabel="Salvando..."
-          className="rounded-lg bg-rose-500 px-5 py-2 font-medium text-white hover:bg-rose-600 disabled:cursor-not-allowed disabled:opacity-60"
+          className="rounded-lg bg-brand-500 px-5 py-2 font-medium text-white hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {submitLabel}
         </SubmitButton>

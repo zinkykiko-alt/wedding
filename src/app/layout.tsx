@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Geist, Playfair_Display, Great_Vibes } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -7,9 +7,21 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+});
+
+const greatVibes = Great_Vibes({
+  variable: "--font-great-vibes",
+  subsets: ["latin"],
+  weight: "400",
+});
+
 export const metadata: Metadata = {
-  title: "Planejador de Casamento",
-  description: "Organize fornecedores, pagamentos e convidados do seu casamento.",
+  title: "Alícia & Bruno · Planejador",
+  description: "Organize fornecedores, pagamentos e convidados do casamento.",
 };
 
 export default function RootLayout({
@@ -18,10 +30,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className={`${geistSans.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col bg-rose-50/40 text-gray-900">
-        {children}
-      </body>
+    <html
+      lang="pt-BR"
+      className={`${geistSans.variable} ${playfair.variable} ${greatVibes.variable} h-full antialiased`}
+    >
+      <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );
 }
