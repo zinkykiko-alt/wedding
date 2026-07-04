@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { COMPANION_OPTIONS, GUEST_STATUSES } from "@/lib/constants";
+import { COMPANION_OPTIONS, GUEST_STATUSES, GUEST_SIDES } from "@/lib/constants";
 import SubmitButton from "@/components/SubmitButton";
 
 export type GuestInitial = {
@@ -7,6 +7,7 @@ export type GuestInitial = {
   companions: number;
   kids: number;
   status: string;
+  side: string;
 };
 
 const field =
@@ -72,25 +73,46 @@ export default function GuestForm({
         </div>
       </div>
 
-      <div>
-        <label htmlFor="status" className={labelCls}>
-          Situação
-        </label>
-        <select
-          id="status"
-          name="status"
-          defaultValue={initial?.status ?? "TITULAR"}
-          className={field}
-        >
-          {GUEST_STATUSES.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </select>
-        <p className="mt-1 text-xs text-gray-400">
-          Titular conta na contagem final. Reserva é um convidado de backup.
-        </p>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label htmlFor="status" className={labelCls}>
+            Situação
+          </label>
+          <select
+            id="status"
+            name="status"
+            defaultValue={initial?.status ?? "TITULAR"}
+            className={field}
+          >
+            {GUEST_STATUSES.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+          <p className="mt-1 text-xs text-gray-400">
+            Titular conta na contagem final. Reserva é um backup.
+          </p>
+        </div>
+        <div>
+          <label htmlFor="side" className={labelCls}>
+            Lado
+          </label>
+          <select
+            id="side"
+            name="side"
+            defaultValue={initial?.side ?? ""}
+            className={field}
+          >
+            <option value="">Não definido</option>
+            {GUEST_SIDES.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+          <p className="mt-1 text-xs text-gray-400">Convidado da Alicia ou do Bruno.</p>
+        </div>
       </div>
 
       <div className="flex items-center gap-3">

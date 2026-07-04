@@ -2,6 +2,7 @@ export type GuestLike = {
   companions: number;
   kids: number;
   status: string;
+  side: string;
 };
 
 export type Headcount = {
@@ -11,10 +12,12 @@ export type Headcount = {
   kids: number; // kids among titulars
   benchCount: number; // number of reserve guests
   benchPeople: number; // people they represent, if promoted
+  bySide: { ALICIA: number; BRUNO: number; NONE: number }; // confirmed people per side
 };
 
 // Titulars count toward the real headcount; reserve guests are tallied
-// separately. Each guest is 1 person plus their companions and kids.
+// separately. Each guest is 1 person plus their companions and kids. Confirmed
+// people are also split by wedding side (Alicia / Bruno / not assigned).
 export function computeHeadcount(guests: GuestLike[]): Headcount {
   const hc: Headcount = {
     titularCount: 0,
@@ -23,6 +26,7 @@ export function computeHeadcount(guests: GuestLike[]): Headcount {
     kids: 0,
     benchCount: 0,
     benchPeople: 0,
+    bySide: { ALICIA: 0, BRUNO: 0, NONE: 0 },
   };
 
   for (const g of guests) {
@@ -35,6 +39,8 @@ export function computeHeadcount(guests: GuestLike[]): Headcount {
       hc.titularPeople += people;
       hc.companions += g.companions;
       hc.kids += g.kids;
+      const key = g.side === "ALICIA" ? "ALICIA" : g.side === "BRUNO" ? "BRUNO" : "NONE";
+      hc.bySide[key] += people;
     }
   }
 

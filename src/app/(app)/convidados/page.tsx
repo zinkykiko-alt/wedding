@@ -13,6 +13,22 @@ function describe(g: Guest): string {
   return parts.join(" · ");
 }
 
+function SideBadge({ side }: { side: string }) {
+  if (side === "ALICIA")
+    return (
+      <span className="shrink-0 rounded-full bg-violet-100 px-2 py-0.5 text-[11px] font-medium text-violet-700">
+        Alicia
+      </span>
+    );
+  if (side === "BRUNO")
+    return (
+      <span className="shrink-0 rounded-full bg-sky-100 px-2 py-0.5 text-[11px] font-medium text-sky-700">
+        Bruno
+      </span>
+    );
+  return null;
+}
+
 function GuestRow({ g }: { g: Guest }) {
   const extra = describe(g);
   return (
@@ -20,7 +36,10 @@ function GuestRow({ g }: { g: Guest }) {
       href={`/convidados/${g.id}`}
       className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-rose-50"
     >
-      <span className="min-w-0 truncate font-medium text-gray-900">{g.name}</span>
+      <span className="flex min-w-0 items-center gap-2">
+        <span className="truncate font-medium text-gray-900">{g.name}</span>
+        <SideBadge side={g.side} />
+      </span>
       <span className="shrink-0 text-sm text-gray-500">{extra || "—"}</span>
     </Link>
   );
@@ -73,6 +92,17 @@ export default async function ConvidadosPage() {
                 {hc.titularCount} titular{hc.titularCount === 1 ? "" : "es"} ·{" "}
                 {hc.companions} acompanhante{hc.companions === 1 ? "" : "s"} ·{" "}
                 {hc.kids} criança{hc.kids === 1 ? "" : "s"}
+              </p>
+              <p className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm">
+                <span className="font-medium text-violet-700">
+                  Alicia {hc.bySide.ALICIA}
+                </span>
+                <span className="font-medium text-sky-700">
+                  Bruno {hc.bySide.BRUNO}
+                </span>
+                {hc.bySide.NONE > 0 && (
+                  <span className="text-gray-400">Sem lado {hc.bySide.NONE}</span>
+                )}
               </p>
             </div>
             <div className="rounded-2xl border border-rose-100 bg-white p-5">

@@ -40,6 +40,12 @@ export const GUEST_STATUSES: readonly Option[] = [
   { value: "BENCH", label: "Reserva" },
 ];
 
+// The two sides of the wedding. "" means not assigned yet.
+export const GUEST_SIDES: readonly Option[] = [
+  { value: "ALICIA", label: "Alicia" },
+  { value: "BRUNO", label: "Bruno" },
+];
+
 /** Look up the human label for a stored value, falling back to the value itself. */
 export function getLabel(list: readonly Option[], value: string): string {
   return list.find((o) => o.value === value)?.label ?? value;

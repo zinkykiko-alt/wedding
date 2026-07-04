@@ -11,7 +11,9 @@ function parseGuest(formData: FormData) {
   const companions = Math.min(2, Math.max(0, Number.isFinite(companionsRaw) ? companionsRaw : 0));
   const kids = Math.max(0, Number.isFinite(kidsRaw) ? kidsRaw : 0);
   const status = String(formData.get("status") ?? "TITULAR") === "BENCH" ? "BENCH" : "TITULAR";
-  return { name, companions, kids, status };
+  const sideRaw = String(formData.get("side") ?? "");
+  const side = sideRaw === "ALICIA" || sideRaw === "BRUNO" ? sideRaw : "";
+  return { name, companions, kids, status, side };
 }
 
 export async function createGuest(formData: FormData) {
