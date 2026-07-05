@@ -50,6 +50,7 @@ model Guest {
   status     String   @default("TITULAR") // TITULAR (counts) | BENCH (reserve)
   side       String   @default("") // "" (undefined) | ALICIA | BRUNO
   godparent  Boolean  @default(false) // padrinho / madrinha
+  parent     Boolean  @default(false) // pai / mãe
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }

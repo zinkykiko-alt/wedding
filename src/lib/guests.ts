@@ -14,6 +14,7 @@ export type GuestFull = {
   status: string;
   side: string;
   godparent: boolean;
+  parent: boolean;
 };
 
 export type GuestFilters = {
@@ -23,6 +24,7 @@ export type GuestFilters = {
   noPhone: boolean;
   noKids: boolean;
   godparentOnly: boolean;
+  parentOnly: boolean;
 };
 
 // Accent- and case-insensitive so "alicia" matches "Alícia".
@@ -48,6 +50,7 @@ export function filterGuests(guests: GuestFull[], f: GuestFilters): GuestFull[] 
     if (f.noPhone && g.phone.trim() !== "") return false;
     if (f.noKids && g.kids !== 0) return false;
     if (f.godparentOnly && !g.godparent) return false;
+    if (f.parentOnly && !g.parent) return false;
     return true;
   });
 }

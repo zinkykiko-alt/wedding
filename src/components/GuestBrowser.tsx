@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { filterGuests, type GuestFull } from "@/lib/guests";
-import GodparentToggle from "@/components/GodparentToggle";
+import FlagToggle from "@/components/FlagToggle";
 
 function SideBadge({ side }: { side: string }) {
   if (side === "ALICIA")
@@ -61,6 +61,7 @@ export default function GuestBrowser({ guests }: { guests: GuestFull[] }) {
   const [status, setStatus] = useState("ALL");
   const [noPhone, setNoPhone] = useState(false);
   const [godparentOnly, setGodparentOnly] = useState(false);
+  const [parentOnly, setParentOnly] = useState(false);
 
   const filtered = useMemo(
     () =>
@@ -71,8 +72,9 @@ export default function GuestBrowser({ guests }: { guests: GuestFull[] }) {
         noPhone,
         noKids: false,
         godparentOnly,
+        parentOnly,
       }),
-    [guests, query, side, status, noPhone, godparentOnly],
+    [guests, query, side, status, noPhone, godparentOnly, parentOnly],
   );
 
   const peopleSum = filtered.reduce((s, g) => s + 1 + g.companions + g.kids, 0);
@@ -81,7 +83,8 @@ export default function GuestBrowser({ guests }: { guests: GuestFull[] }) {
     side !== "ALL" ||
     status !== "ALL" ||
     noPhone ||
-    godparentOnly;
+    godparentOnly ||
+    parentOnly;
 
   function clearAll() {
     setQuery("");
@@ -89,6 +92,7 @@ export default function GuestBrowser({ guests }: { guests: GuestFull[] }) {
     setStatus("ALL");
     setNoPhone(false);
     setGodparentOnly(false);
+    setParentOnly(false);
   }
 
   return (
@@ -115,6 +119,9 @@ export default function GuestBrowser({ guests }: { guests: GuestFull[] }) {
         </select>
         <Toggle active={godparentOnly} onClick={() => setGodparentOnly((v) => !v)}>
           ★ Padrinhos/madrinhas
+        </Toggle>
+        <Toggle active={parentOnly} onClick={() => setParentOnly((v) => !v)}>
+          ♥ Pais
         </Toggle>
         <Toggle active={noPhone} onClick={() => setNoPhone((v) => !v)}>
           Só sem telefone
@@ -150,7 +157,26 @@ export default function GuestBrowser({ guests }: { guests: GuestFull[] }) {
                 key={g.id}
                 className="flex items-center gap-2 px-3 py-3 hover:bg-brand-50"
               >
-                <GodparentToggle id={g.id} active={g.godparent} />
+                <FlagToggle
+                  id={g.id}
+                  flag="godparent"
+                  active={g.godparent}
+                  iconOn="★"
+                  iconOff="☆"
+                  activeClass="text-amber-500 hover:text-amber-500"
+                  titleOn="Padrinho/Madrinha — clique para desmarcar"
+                  titleOff="Marcar como padrinho/madrinha"
+                />
+                <FlagToggle
+                  id={g.id}
+                  flag="parent"
+                  active={g.parent}
+                  iconOn="♥"
+                  iconOff="♡"
+                  activeClass="text-rose-500 hover:text-rose-500"
+                  titleOn="Pai/Mãe — clique para desmarcar"
+                  titleOff="Marcar como pai/mãe"
+                />
                 <Link
                   href={`/convidados/${g.id}`}
                   className="flex min-w-0 flex-1 items-center justify-between gap-3"
@@ -161,6 +187,11 @@ export default function GuestBrowser({ guests }: { guests: GuestFull[] }) {
                       {g.godparent && (
                         <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-700">
                           ★ Padrinho/Madrinha
+                        </span>
+                      )}
+                      {g.parent && (
+                        <span className="shrink-0 rounded-full bg-rose-100 px-2 py-0.5 text-[11px] font-medium text-rose-700">
+                          ♥ Pais
                         </span>
                       )}
                       <SideBadge side={g.side} />

@@ -24,6 +24,7 @@ export default async function EditarConvidadoPage({
     status: guest.status,
     side: guest.side,
     godparent: guest.godparent,
+    parent: guest.parent,
   };
   const update = updateGuest.bind(null, guest.id);
   const remove = deleteGuest.bind(null, guest.id);

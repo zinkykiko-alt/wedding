@@ -12,7 +12,12 @@ type GuestInput = {
   status: string;
   side: string;
   godparent: boolean;
+  parent: boolean;
 };
+
+function toBool(v: unknown): boolean {
+  return v === true || v === "on" || v === "true";
+}
 
 function normalize(input: {
   name?: unknown;
@@ -22,6 +27,7 @@ function normalize(input: {
   status?: unknown;
   side?: unknown;
   godparent?: unknown;
+  parent?: unknown;
 }): GuestInput {
   const name = String(input.name ?? "").trim();
   const phone = String(input.phone ?? "").trim().slice(0, 40);
@@ -32,9 +38,16 @@ function normalize(input: {
   const status = String(input.status ?? "TITULAR") === "BENCH" ? "BENCH" : "TITULAR";
   const sideRaw = String(input.side ?? "");
   const side = sideRaw === "ALICIA" || sideRaw === "BRUNO" ? sideRaw : "";
-  const godparent =
-    input.godparent === true || input.godparent === "on" || input.godparent === "true";
-  return { name, phone, companions, kids, status, side, godparent };
+  return {
+    name,
+    phone,
+    companions,
+    kids,
+    status,
+    side,
+    godparent: toBool(input.godparent),
+    parent: toBool(input.parent),
+  };
 }
 
 function fromForm(formData: FormData) {
@@ -46,6 +59,7 @@ function fromForm(formData: FormData) {
     status: formData.get("status"),
     side: formData.get("side"),
     godparent: formData.get("godparent"),
+    parent: formData.get("parent"),
   });
 }
 
@@ -59,6 +73,7 @@ export async function addGuest(input: {
   status: string;
   side: string;
   godparent: boolean;
+  parent: boolean;
 }): Promise<{ ok: boolean }> {
   const guest = normalize(input);
   if (!guest.name) return { ok: false };
@@ -89,8 +104,15 @@ export async function deleteGuest(id: string) {
   redirect("/convidados");
 }
 
-// Toggle padrinho/madrinha directly from the list (no page navigation).
-export async function setGodparent(id: string, value: boolean) {
-  await prisma.guest.update({ where: { id }, data: { godparent: value } });
+// Toggle a boolean flag (padrinho/madrinha or pai/mãe) directly from the list.
+export async function setGuestFlag(
+  id: string,
+  flag: "godparent" | "parent",
+  value: boolean,
+) {
+  await prisma.guest.update({
+    where: { id },
+    data: flag === "godparent" ? { godparent: value } : { parent: value },
+  });
   revalidatePath("/convidados");
 }

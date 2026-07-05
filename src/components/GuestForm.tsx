@@ -10,6 +10,7 @@ export type GuestInitial = {
   status: string;
   side: string;
   godparent: boolean;
+  parent: boolean;
 };
 
 const field =
@@ -133,15 +134,26 @@ export default function GuestForm({
         </div>
       </div>
 
-      <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-700">
-        <input
-          type="checkbox"
-          name="godparent"
-          defaultChecked={initial?.godparent ?? false}
-          className="h-4 w-4 accent-brand-500"
-        />
-        ★ Padrinho / Madrinha
-      </label>
+      <div className="flex flex-wrap gap-x-6 gap-y-2">
+        <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-700">
+          <input
+            type="checkbox"
+            name="godparent"
+            defaultChecked={initial?.godparent ?? false}
+            className="h-4 w-4 accent-brand-500"
+          />
+          ★ Padrinho / Madrinha
+        </label>
+        <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-700">
+          <input
+            type="checkbox"
+            name="parent"
+            defaultChecked={initial?.parent ?? false}
+            className="h-4 w-4 accent-brand-500"
+          />
+          ♥ Pais (pai/mãe)
+        </label>
+      </div>
 
       <div className="flex items-center gap-3">
         <SubmitButton
