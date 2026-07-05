@@ -25,7 +25,7 @@ function normalize(input: {
   const phone = String(input.phone ?? "").trim().slice(0, 40);
   const companionsRaw = parseInt(String(input.companions ?? "0"), 10);
   const kidsRaw = parseInt(String(input.kids ?? "0"), 10);
-  const companions = Math.min(2, Math.max(0, Number.isFinite(companionsRaw) ? companionsRaw : 0));
+  const companions = Math.min(4, Math.max(0, Number.isFinite(companionsRaw) ? companionsRaw : 0));
   const kids = Math.max(0, Number.isFinite(kidsRaw) ? kidsRaw : 0);
   const status = String(input.status ?? "TITULAR") === "BENCH" ? "BENCH" : "TITULAR";
   const sideRaw = String(input.side ?? "");
