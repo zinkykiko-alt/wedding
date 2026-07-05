@@ -44,6 +44,7 @@ model Payment {
 model Guest {
   id         String   @id @default(cuid())
   name       String
+  phone      String   @default("")
   companions Int      @default(0) // 0, 1, or 2 (none / +1 / +2)
   kids       Int      @default(0)
   status     String   @default("TITULAR") // TITULAR (counts) | BENCH (reserve)

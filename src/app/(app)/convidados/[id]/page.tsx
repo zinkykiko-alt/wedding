@@ -18,6 +18,7 @@ export default async function EditarConvidadoPage({
 
   const initial: GuestInitial = {
     name: guest.name,
+    phone: guest.phone,
     companions: guest.companions,
     kids: guest.kids,
     status: guest.status,

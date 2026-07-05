@@ -4,6 +4,7 @@ import SubmitButton from "@/components/SubmitButton";
 
 export type GuestInitial = {
   name: string;
+  phone: string;
   companions: number;
   kids: number;
   status: string;
@@ -25,19 +26,35 @@ export default function GuestForm({
 }) {
   return (
     <form action={action} className="space-y-4 rounded-2xl border border-brand-100 bg-white p-5">
-      <div>
-        <label htmlFor="name" className={labelCls}>
-          Nome *
-        </label>
-        <input
-          id="name"
-          name="name"
-          required
-          autoFocus
-          defaultValue={initial?.name ?? ""}
-          placeholder="Nome do convidado"
-          className={field}
-        />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label htmlFor="name" className={labelCls}>
+            Nome *
+          </label>
+          <input
+            id="name"
+            name="name"
+            required
+            autoFocus
+            defaultValue={initial?.name ?? ""}
+            placeholder="Nome do convidado"
+            className={field}
+          />
+        </div>
+        <div>
+          <label htmlFor="phone" className={labelCls}>
+            Telefone
+          </label>
+          <input
+            id="phone"
+            name="phone"
+            type="tel"
+            inputMode="tel"
+            defaultValue={initial?.phone ?? ""}
+            placeholder="(14) 90000-0000"
+            className={field}
+          />
+        </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
