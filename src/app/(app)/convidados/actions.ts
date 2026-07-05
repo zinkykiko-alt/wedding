@@ -11,6 +11,7 @@ type GuestInput = {
   kids: number;
   status: string;
   side: string;
+  godparent: boolean;
 };
 
 function normalize(input: {
@@ -20,6 +21,7 @@ function normalize(input: {
   kids?: unknown;
   status?: unknown;
   side?: unknown;
+  godparent?: unknown;
 }): GuestInput {
   const name = String(input.name ?? "").trim();
   const phone = String(input.phone ?? "").trim().slice(0, 40);
@@ -30,7 +32,9 @@ function normalize(input: {
   const status = String(input.status ?? "TITULAR") === "BENCH" ? "BENCH" : "TITULAR";
   const sideRaw = String(input.side ?? "");
   const side = sideRaw === "ALICIA" || sideRaw === "BRUNO" ? sideRaw : "";
-  return { name, phone, companions, kids, status, side };
+  const godparent =
+    input.godparent === true || input.godparent === "on" || input.godparent === "true";
+  return { name, phone, companions, kids, status, side, godparent };
 }
 
 function fromForm(formData: FormData) {
@@ -41,6 +45,7 @@ function fromForm(formData: FormData) {
     kids: formData.get("kids"),
     status: formData.get("status"),
     side: formData.get("side"),
+    godparent: formData.get("godparent"),
   });
 }
 
@@ -53,6 +58,7 @@ export async function addGuest(input: {
   kids: number;
   status: string;
   side: string;
+  godparent: boolean;
 }): Promise<{ ok: boolean }> {
   const guest = normalize(input);
   if (!guest.name) return { ok: false };
@@ -81,4 +87,10 @@ export async function deleteGuest(id: string) {
   await prisma.guest.delete({ where: { id } });
   revalidatePath("/convidados");
   redirect("/convidados");
+}
+
+// Toggle padrinho/madrinha directly from the list (no page navigation).
+export async function setGodparent(id: string, value: boolean) {
+  await prisma.guest.update({ where: { id }, data: { godparent: value } });
+  revalidatePath("/convidados");
 }

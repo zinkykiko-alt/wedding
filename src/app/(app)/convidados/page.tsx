@@ -16,6 +16,7 @@ export default async function ConvidadosPage() {
     kids: g.kids,
     status: g.status,
     side: g.side,
+    godparent: g.godparent,
   }));
 
   const hc = computeHeadcount(guests);

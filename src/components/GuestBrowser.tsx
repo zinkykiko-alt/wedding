@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { filterGuests, type GuestFull } from "@/lib/guests";
+import GodparentToggle from "@/components/GodparentToggle";
 
 function SideBadge({ side }: { side: string }) {
   if (side === "ALICIA")
@@ -59,21 +60,35 @@ export default function GuestBrowser({ guests }: { guests: GuestFull[] }) {
   const [side, setSide] = useState("ALL");
   const [status, setStatus] = useState("ALL");
   const [noPhone, setNoPhone] = useState(false);
+  const [godparentOnly, setGodparentOnly] = useState(false);
 
   const filtered = useMemo(
-    () => filterGuests(guests, { query, side, status, noPhone, noKids: false }),
-    [guests, query, side, status, noPhone],
+    () =>
+      filterGuests(guests, {
+        query,
+        side,
+        status,
+        noPhone,
+        noKids: false,
+        godparentOnly,
+      }),
+    [guests, query, side, status, noPhone, godparentOnly],
   );
 
   const peopleSum = filtered.reduce((s, g) => s + 1 + g.companions + g.kids, 0);
   const anyFilter =
-    query.trim() !== "" || side !== "ALL" || status !== "ALL" || noPhone;
+    query.trim() !== "" ||
+    side !== "ALL" ||
+    status !== "ALL" ||
+    noPhone ||
+    godparentOnly;
 
   function clearAll() {
     setQuery("");
     setSide("ALL");
     setStatus("ALL");
     setNoPhone(false);
+    setGodparentOnly(false);
   }
 
   return (
@@ -98,6 +113,9 @@ export default function GuestBrowser({ guests }: { guests: GuestFull[] }) {
           <option value="TITULAR">Titular</option>
           <option value="BENCH">Reserva</option>
         </select>
+        <Toggle active={godparentOnly} onClick={() => setGodparentOnly((v) => !v)}>
+          ★ Padrinhos/madrinhas
+        </Toggle>
         <Toggle active={noPhone} onClick={() => setNoPhone((v) => !v)}>
           Só sem telefone
         </Toggle>
@@ -128,27 +146,37 @@ export default function GuestBrowser({ guests }: { guests: GuestFull[] }) {
           {filtered.map((g) => {
             const extra = describe(g);
             return (
-              <Link
+              <div
                 key={g.id}
-                href={`/convidados/${g.id}`}
-                className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-brand-50"
+                className="flex items-center gap-2 px-3 py-3 hover:bg-brand-50"
               >
-                <span className="min-w-0 flex-1">
-                  <span className="flex items-center gap-2">
-                    <span className="truncate font-medium text-gray-900">{g.name}</span>
-                    <SideBadge side={g.side} />
-                    {g.status === "BENCH" && (
-                      <span className="shrink-0 rounded-full bg-gray-200 px-2 py-0.5 text-[11px] font-medium text-gray-500">
-                        Reserva
-                      </span>
+                <GodparentToggle id={g.id} active={g.godparent} />
+                <Link
+                  href={`/convidados/${g.id}`}
+                  className="flex min-w-0 flex-1 items-center justify-between gap-3"
+                >
+                  <span className="min-w-0 flex-1">
+                    <span className="flex flex-wrap items-center gap-2">
+                      <span className="truncate font-medium text-gray-900">{g.name}</span>
+                      {g.godparent && (
+                        <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-700">
+                          ★ Padrinho/Madrinha
+                        </span>
+                      )}
+                      <SideBadge side={g.side} />
+                      {g.status === "BENCH" && (
+                        <span className="shrink-0 rounded-full bg-gray-200 px-2 py-0.5 text-[11px] font-medium text-gray-500">
+                          Reserva
+                        </span>
+                      )}
+                    </span>
+                    {g.phone && (
+                      <span className="mt-0.5 block text-xs text-gray-400">{g.phone}</span>
                     )}
                   </span>
-                  {g.phone && (
-                    <span className="mt-0.5 block text-xs text-gray-400">{g.phone}</span>
-                  )}
-                </span>
-                <span className="shrink-0 text-sm text-gray-500">{extra || "—"}</span>
-              </Link>
+                  <span className="shrink-0 text-sm text-gray-500">{extra || "—"}</span>
+                </Link>
+              </div>
             );
           })}
         </div>

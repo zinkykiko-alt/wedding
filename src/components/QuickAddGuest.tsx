@@ -19,6 +19,7 @@ export default function QuickAddGuest() {
   const [phone, setPhone] = useState("");
   const [companions, setCompanions] = useState("0");
   const [kids, setKids] = useState("0");
+  const [godparent, setGodparent] = useState(false);
   // Sticky (kept between adds to speed up batches):
   const [side, setSide] = useState("");
   const [status, setStatus] = useState("TITULAR");
@@ -40,6 +41,7 @@ export default function QuickAddGuest() {
         kids: Number(kids),
         status,
         side,
+        godparent,
       });
       if (res.ok) {
         setLastAdded(trimmed);
@@ -47,6 +49,7 @@ export default function QuickAddGuest() {
         setPhone("");
         setCompanions("0");
         setKids("0");
+        setGodparent(false);
         router.refresh();
         nameRef.current?.focus();
       }
@@ -152,6 +155,15 @@ export default function QuickAddGuest() {
             ))}
           </select>
         </div>
+        <label className="flex cursor-pointer items-center gap-1.5 pb-2 text-sm font-medium text-gray-700">
+          <input
+            type="checkbox"
+            checked={godparent}
+            onChange={(e) => setGodparent(e.target.checked)}
+            className="h-4 w-4 accent-brand-500"
+          />
+          ★ Padrinho/Madrinha
+        </label>
         <button
           type="submit"
           disabled={pending}
